@@ -1,0 +1,9 @@
+dependencies:
+- name: resengit-common
+  repository: oci://harbor.res.eng.it/resengit/helm
+  version: 0.9.1
+- name: mongodb
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 14.9.4
+digest: sha256:21b5507395c6e40d64b25ed160b50b1a3c5248f8357274e58a6ffbd1ce2572bf
+generated: "2024-02-18T19:52:08.529524648+01:00"

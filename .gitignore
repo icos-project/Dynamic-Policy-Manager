@@ -1,0 +1,11 @@
+.project
+.pydevproject
+.env.local
+__pycache__
+.vscode
+.venv
+dpm.db
+deploy/charts/dynamic-policy-manager/charts
+.settings
+.git
+docs/design

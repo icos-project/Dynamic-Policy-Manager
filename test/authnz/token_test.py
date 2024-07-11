@@ -1,0 +1,32 @@
+# ICOS Dynamic Policy Manager
+# Copyright © 2022-2024 Engineering Ingegneria Informatica S.p.A.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# This work has received funding from the European Union's HORIZON research
+# and innovation programme under grant agreement No. 101070177.
+
+from freezegun import freeze_time
+import pytest
+from polman.common.api import get_authenticated_user
+
+@pytest.mark.asyncio
+@freeze_time("2024-03-14 16:00:00")
+async def test_token_without_email(test_keycloak_client, test_config, mocker):
+  
+  mocker.patch.object(test_keycloak_client.keycloak_openid, "public_key", return_value="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgTGF4mKVEa+eWX0S/+EWIfkkqbLba5WuQ1KKGRQz+P56Y0WNRbgjNl0CObndffmixbpgp4kg5jKq78HoFFP7bj0jQSNC3P26K9xPolFXbAlNJe41VMdI7xOkOF0D9GCplEylGlUlCgpaBnbloI4WcbH+RQ6n6Qp6MmNE+/xC3OMMhgEBacbiGtIR71N/HcDYDUORE335sSRpkrHhMxk3eWgZdIyfX88n9UkI3CtgNGIGgF8/w7ZYF2XBmVuv5+QE9d5fM9pZKWQnzBnsMJy4Xc+qZrZMI45KCHIW/DSFVGSsGboiVHSNVOu3mNhPSjvJtIH/7lItCG6m5zvBAvNf8QIDAQAB")
+
+  token = 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJncFU2UmxDNThaOTZNWXdwX01KTnJiX1pwaHY1SXVlMGlKdEtuSGYtN0hRIn0.eyJleHAiOjE3MTA0MzM4OTgsImlhdCI6MTcxMDQzMzU5OCwianRpIjoiNzIxZWUzYTctMWRmNC00NjgwLWJlYjAtYzNiMjI3MDVjZjJlIiwiaXNzIjoiaHR0cHM6Ly9rZXljbG9hay5kZXYuaWNvcy45MS4xMDkuNTYuMjE0LnNzbGlwLmlvL3JlYWxtcy9pY29zLWRldiIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJkZTIzYTUzYy00MTIzLTQ3Y2YtYjBhZi04ZGQzY2M0YTVmMTEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzaGVsbC1iYWNrZW5kIiwic2Vzc2lvbl9zdGF0ZSI6ImQ5YjNjZDIzLWJmMTMtNGY5NS1iMmUxLTc3OThlN2M2YjMwMSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIiwiZGVmYXVsdC1yb2xlcy1pY29zLWRldiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUiLCJzaWQiOiJkOWIzY2QyMy1iZjEzLTRmOTUtYjJlMS03Nzk4ZTdjNmIzMDEiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJ0ZXN0LXNoZWxsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4iLCJnaXZlbl9uYW1lIjoiIiwiZmFtaWx5X25hbWUiOiJ0ZXN0LXNoZWxsIn0.br0c8bzE7A44spdhwy7EmFFlyTPLv7FEknKwnn__768fBfWdKnAbz0cyugjJ1DhXYG-Z9Lz0NzZToXCul3REQiRS-dJCGi-FbkZSB7r5aYdUjpovilio_LtcOnQfpIb7PfXDLJyTY30MMwd5RK_CkSECVxVdE-iLXTbvjiABjtrhS9-FQrb8DXzfURUu5HlReUAwDQ6gSgwgxYeVsGgue_fSefuQXhTiEAWZDCZIyoU3mx-rg6UFp0SFUae-i8BsClRvH6fgswdNNVKss3eh8nMFRYq7e0lHEIhy3P2s4cftLKNZfXgCie2Fi9z6iEsigy2Be6afPuv-tDSFDfhgvA'
+  user = await get_authenticated_user(test_keycloak_client, test_config, token)
+  
+  print(user)

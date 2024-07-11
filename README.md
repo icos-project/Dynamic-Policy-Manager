@@ -11,7 +11,7 @@ by itself; it then sends the remediation action to the Job Manager otherwise the
 sends a request of the suggested action to the intelligence block.
 
 ## Development
-An [API](api.md) REST is implemetend for the [use](usage.md) of the Dynamic Policy Manager.
+An [API](docs/api.md) REST is implemetend for the [use](docs/usage.md) of the Dynamic Policy Manager.
 
 ### Requirements
 
@@ -56,8 +56,3 @@ DPLM_API_PORT=8000
 DPLM_VERBOSITY=3
 ```
 
-# Legal
-The Dynamic Policy Manager is released under the [Apache License version 2.0](LICENSE).
-Copyright 2022-2024 Gabriele Giammatteo , Engineering Ingegneria Informatica S.p.A., All rights reserved.
-
-This work has received funding from the European Union's HORIZON research and innovation programme under grant agreement No. 101070177.

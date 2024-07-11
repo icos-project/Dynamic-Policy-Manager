@@ -1,0 +1,16 @@
+name: compss-demo-1
+description: |
+ A sample COMPSs application to demonstrate application performance policies definition,
+ monitoring and violation. It also has a security policy
+components:
+- name: compss-app
+  type: manifest
+  manifests:
+  - name: compss-hello-world-demo
+  policies:
+  - security: high
+  - fromTemplate: compss-under-allocation
+    remediation: scale-up
+    variables:
+      thresholdTimeSeconds: 120
+      compssTask: provesOtel.example_task

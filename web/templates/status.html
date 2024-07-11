@@ -1,0 +1,284 @@
+{% extends 'core.html' %}
+
+{% block core_body%}
+
+<section>
+
+<div class="container">
+<!--
+	<div class="row">
+    <div class="col" style="margin-left:14px; margin-top:14px;font-size: 20px;">
+      <p><a href="/polman/docs/" target="_blank"><label class="label label-info" >ICOS Polman API</label></a></p>
+    </div>
+    
+</div>
+-->
+<hr class="new5" />
+<table>
+<thead class="tbl-header">
+<tr>
+	
+	<th>Id</th>
+	<th>Created</th>
+	<th>Name</th>
+	<th>Phase</th>
+	<th>Status</th>
+	<!-- <th class="col-xs-3"></th> -->
+</tr>
+</thead>
+</table>
+<hr />
+{% for p in policies %}  
+<table class="tbl-content">
+<tbody>
+<tr> 
+<td>
+	<a href=#{{p.id}} data-toggle="collapse" data-target="#{{p.id}}">
+	<!-- <span class="glyphicon glyphicon-expand" title="Expand all"></span> -->
+	{{p.id}}</a>
+	
+</td>
+<td>
+	{%if p.status.events!=[]%}
+		{%for event in p.status.events%}
+			{%if  event.type.value=='created'%}
+				 {{event.timestamp}}
+			{%endif%}
+		{%endfor%}	
+	{%endif%}
+</td>
+<td>{{p.name}}</td>  
+<td data-toggle="collapse" data-target="#{{p.id}}">
+	{%if p.status.events!=[]%}
+		{%if  p.status.phase.value=='enforced'%}
+		<label class="label label-success">
+		{%endif%}
+		{%if  p.status.phase.value=='violated'%}
+		<label class="label label-danger">
+		{%endif%}
+		{%if  p.status.phase.value=='inactive'%}
+		<label class="label label-default">
+		{%endif%}
+		{%if  p.status.phase.value=='unknown'%}
+		<label class="label label-light">
+		{%endif%}
+		{{p.status.phase.value}}
+	{%else%}	
+	<label class="label label-success">
+		OK
+	</label>
+	{%endif%}	
+</td>
+<td>
+	{%if p.status.events!=[]%}
+		{%for event in p.status.events%}
+			{% if loop.last %}
+				{%if  event.type.value=='violated'%}
+				  <label class="label label-danger">
+				{%endif%}
+				{%if  event.type.value=='resolved'%}
+				  <label class="label label-success">
+				{%endif%}
+				{%if  event.type.value=='activated'%}
+				  <label class="label label-info">
+				{%endif%}
+				{%if  event.type.value=='created'%}
+				  <label class="label label-primary">
+				{%endif%}
+				{%if  event.type.value=='deactivated'%}
+				  <label class="label label-default">
+				{%endif%}
+				{%if  event.type.value=='deleted'%}
+				  <label class="label label-warning">
+				{%endif%}
+				{{event.type.value}} </label>
+			{%endif%}
+		{%endfor%}	
+	{%endif%}
+</td>
+<!-- madigiro 15-04-2024: disable delete policy action  
+<td class="col-xs-3">
+	    <button class="btn btn-danger btn-xs" onclick='delete_pol("{{p.id}}")' >
+		<i class="glyphicon glyphicon-trash"></i>
+		</button>
+</td>
+ -->
+</tr>
+</tbody>
+</table>
+{% block scripts %}
+	<script type="text/javascript">
+	class DeleteHTTP { 
+		  
+	    // Make an HTTP PUT Request 
+	    async delete(url) { 
+	  
+	        // Awaiting fetch which contains  
+	        // method, headers and content-type 
+	        const response = await fetch(url, { 
+	            method: 'DELETE', 
+	            headers: { 
+	                'Content-type': 'application/json'
+	            } 
+	        }); 
+	  
+	        // Awaiting for the resource to be deleted 
+	        const resData = 'resource deleted...'; 
+	  
+	        // Return response data  
+	        return resData; 
+	    } 
+	} 
+	function delete_pol(id){
+		// Instantiating new EasyHTTP class 
+		const http = new DeleteHTTP; 
+		  
+		// Update Post 
+		http.delete('http://localhost:8000/polman/registry/api/v1/policies/'+id) 
+		  
+		// Resolving promise for response data 
+		.then(data => console.log(data)) 
+		  
+		// Resolving promise for error 
+		.catch(err => console.log(err)); 
+		
+		alert('http://localhost:8000/polman/registry/api/v1/policies/' + id + ' deleted');
+    	location.reload();
+		
+	}
+	</script>
+{% endblock %}
+
+
+<div  class="collapse" id={{p.id}}>
+     <table class="table table-bordered"> 
+     <!-- <caption style="background: #2196F3; color:white; text-align:center"> -->
+     <caption style="background: -webkit-linear-gradient(left, #25c481, #25b7c4);
+  background: linear-gradient(to right, #25c481, #25b7c4); color:#ffffff; text-align:center;">
+     <h4>Policy&nbsp;Data&nbsp;&nbsp;{{p.id}}</h4>
+     </caption>
+     <thead>
+     <tr>
+        <th colspan=2> Spec</th>
+        <th> Action</th>
+        <th> Subject</th>
+        <th> Properties</th>
+        <th> Variables</th>
+     </tr>
+     </thead>
+     <tbody>
+		<tr>
+	        <td colspan=2>
+	        {%for key, item in p.spec %} 
+	          <p><label class="label label-info">{{key}}</label>&nbsp;:&nbsp;&nbsp;{{item}} </p>
+	        {% endfor %}
+	        </td>
+	        <td>
+	        {% for key, item in p.action%}
+	            <p><label class="label label-info">{{key}}</label>&nbsp;:&nbsp;&nbsp;{{item}} </p>
+	        {% endfor %}
+	        </td>
+	        <td>
+	        {%for key, item in p.subject %} 
+	           <p><label class="label label-info">{{key}}</label>&nbsp;:&nbsp;&nbsp;{{item}} </p>
+	        {% endfor %}
+	        </td>
+	        <td>
+	        {%if p.properties!={}%}
+	        <p><label class="label label-info">properties</label></p> 
+	        {{p.properties}}
+	        {%endif%}
+	        </td>
+	        <td>
+	        {%if p.variables!={}%}
+		    	{%for key in p.variables %}
+		        <p><!-- label class="label label-info">variables</label-->{{p.variables}}</p>
+		    	{% endfor %}
+	        {%endif%}
+		    </td>
+        </tr>
+     </tbody>                   
+ 	</table>
+{%if p.status.events!=[]%}
+<table class="table table-bordered">
+<!-- <caption style="background: lightblue; text-align:center; border: 1px solid black;"> -->
+    
+    {%if  p.status.phase.value=='enforced'%}
+	<caption style="background: #06B27D ;text-align:center; border: 0px solid black;font-size:16px">
+	<h4>
+	<label class="label label-light" >
+	{%endif%}
+	{%if  p.status.phase.value=='violated'%}
+	<caption style="background: #FF5733 ;text-align:center; border: 0px solid black;font-size:16px">
+	<h4>
+	<label class="label label-danger">
+	{%endif%}
+	{%if  p.status.phase.value=='inactive'%}
+	<caption style="background: #E5E8E3 ;text-align:center; border: 0px solid black;font-size:16px">
+	<h4>
+	<label class="label label-default" style="font-size:16px">
+	{%endif%}
+	{%if  p.status.phase.value=='unknown'%}
+	<caption style="background: #FFFFFF;color:black;text-align:center; border: 0px solid black;font-size:16px">
+	<h4>
+	{%endif%}
+	<label class="label label-light" style="font-size:16px; color:white">
+	Events History Phase&nbsp;&nbsp;{{p.status.phase.value}}
+	</label>
+	</h4>
+	</caption>
+	<thead>
+		<tr>
+		<th>Type</th>
+		<th>TimeStamp</th>
+		<th>Details</th>
+		</tr>
+	</thead>
+	<tbody >		   
+	{%for event in p.status.events%}
+		<tr>
+		<td>
+			{%if  event.type.value=='violated'%}
+			  <label class="label label-danger">
+			{%endif%}
+			{%if  event.type.value=='resolved'%}
+			  <label class="label label-success">
+			{%endif%}
+			{%if  event.type.value=='activated'%}
+			  <label class="label label-info">
+			{%endif%}
+			{%if  event.type.value=='created'%}
+			  <label class="label label-primary">
+			{%endif%}
+			{%if  event.type.value=='deactivated'%}
+			  <label class="label label-default">
+			{%endif%}
+			{%if  event.type.value=='deleted'%}
+			  <label class="label label-warning">
+			{%endif%}
+			{{event.type.value}} 
+			</label>
+		</td>
+		<td>
+		  {{event.timestamp}}
+		</td>
+		<td>
+		{%if event.details!={}%}
+			{%for key, item in event.details.items()%} 
+				<p><label class="label label-info">{{key}}</label>&nbsp;{{item}}</p>
+			{%endfor%}
+		{%endif%}
+		</td>
+		</tr>
+	{%endfor%}
+	</tbody>
+</table>
+{%endif%}
+ </div>                       
+{% endfor %}
+<hr />
+
+</div> 
+</section>
+
+{% endblock core_body%}

@@ -1,0 +1,23 @@
+@startuml "Components"
+
+hide footbox
+!pragma teoz true
+
+participant shell
+participant job_manager
+participant policy_manager as "Policy Manager"
+
+shell -> policy_manager: create policies (app descriptor)
+job_manager -> policy_manager: create policy
+
+policy_manager -> policy_manager: start monitoring
+
+== Without Ruler ==
+policy_manager -> thanos: get values
+policy_manager -> policy_manager: calculate violation
+policy_manager -> policy_manager: send notifications
+
+== With Ruler ==
+policy_manager -> ruler: configure rule
+ruler -> policy_manager: alert notification
+policy_manager -> policy_manager: send notifications

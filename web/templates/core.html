@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dynamic Policy Manager Status Page</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+   	<meta name="viewport" content="width=device-width, initial-scale=1">
+  	<!-- 
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  	<META HTTP-EQUIV=REFRESH content="60">
+   	-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  	<script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js" crossorigin></script>
+  	<script>
+		setInterval(function(){
+		   window.location.reload(1);
+		}, 30000);
+		
+		// '.tbl-content' consumed little space for vertical scrollbar, scrollbar width depend on browser/os/platfrom. Here calculate the scollbar width .
+		$(window).on("load resize ", function() {
+		  var scrollWidth = $('.tbl-content').width() - $('.tbl-content table').width();
+		  $('.tbl-header').css({'padding-right':scrollWidth});
+		}).resize();
+	</script>
+</head>
+<body>
+<!-- HEADER -->
+{% block core_header%}
+<div style="display:table;">
+<h1 class="custom_h1"><p style="display:table-cell;">
+
+<img src="{{ url_for('static', path='imgs/ICOS_logo.png') }}" style="width:93px;height:35px" />  Dynamic Policy Manager
+
+</div>
+<hr class="new3" />
+{% endblock core_header%}
+{% block core_body%}
+<!-- BODY -->
+{% endblock core_body%}
+<!-- FOOTER -->
+{% block core_footer%}
+<!-- follow me template -->
+<div class="made-with-icos">
+  Made by
+  <br />
+  <!-- 
+  	<img src="https://le-cdn.website-editor.net/s/7c7b4b949f77408ca16860f6248c46f6/dms3rep/multi/opt/ICOS_logo_bright-61fe1c68-338w.png?Expires=1714906698&Signature=YL3pnFmA~b~mVZpsiTo6w2IN4~k3qA-5fWa-t1Y8b-WRS9jBoPugfOYZcPD-k0dhRtHNQsxdCRH6xP7Sz-ZgG3SkKuvGCTnbDr3XXhBc8cIeGJkPaIhSNsE6uAa9In-LFntvomhO3LQDlrpqXIWITieHSvAopKAs4Lh~tpj8vLhPKFDwq1~qNmBETVq95tLsQJBVlgm4FZAlGAV~tPGY7POEM0YMpoaQjJpM4T6AyxQ-vVw3wuf3Dp5ao35Feo8jypElJPG0Rao734sdIMLlcHUXXZ~OL1pP6V90P-1OFqt2xUxgklIXE165MSgMt1-izGP5OCrwkt5tOmcTRMjA0A__&Key-Pair-Id=K2NXBXLF010TJW"></img>
+   -->
+   <img src="{{ url_for('static', path='imgs/ICOS_logo.png') }}" style="width:33px;height:15px" /> 
+  
+  <br />Towards a functional continuum operating system
+  <p>
+  <a class="made-with-icos" target="_blank" href="https://www.icos-project.eu/">
+  https://www.icos-project.eu/</a>
+  </p>
+</div>
+{% endblock core_footer%}
+</body>
+</html>
+
+

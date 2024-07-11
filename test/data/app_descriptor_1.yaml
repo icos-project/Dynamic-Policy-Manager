@@ -1,0 +1,94 @@
+name: mjpeg-ffmpeg-app
+description: "the description"
+components:
+- name: ffmpeg
+  type: manifest
+  manifests:
+  - name: ffmpeg-pod
+  policies:
+  - name: policyInside1
+    fromTemplate: compss-under-allocation
+    remediation: scale-down
+    variables:
+      thresholdTimeSeconds: 120
+      compssTask: my_task_abc
+- name: mjpeg
+  type: manifest
+  manifests:
+  - name: mjpeg-service
+  - name: mjpeg-pod
+policies:
+- name: policy1
+  component: "*"
+  fromTemplate: compss-under-allocation
+  remediation: scale-up
+  variables:
+    thresholdTimeSeconds: 120
+    compssTask: my_task_abc
+- name: policy2
+  component: component-2
+  spec:
+    expr: "sum by ...."
+    thresholds:
+      warning: 200
+      critical: 500
+  variables:
+    thresholdTimeSeconds: 120
+    compssTask: my_task_abc
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ffmpeg-pod
+  namespace: demo
+spec:
+  containers:
+  - name: ffmpeg-container
+    image: santojim/ffmpeg:arm64
+    command:
+    - "ffmpeg"
+    args:
+    - "-i"
+    - "http://10.150.0.133:30674/mjpeg"
+    - "-fs"
+    - "100M"
+    - "-c:v"
+    - "copy"
+    - "video.mp4"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mjpeg-pod
+  namespace: demo
+  labels:
+    app.kubernetes.io/name: mjpeg
+spec:
+  containers:
+  - name: kceu
+    image: santojim/camera_to_ip:arm64
+    command:
+    - /cam2ip
+    args:
+    - --bind-addr=:8080
+    ports:
+    - containerPort: 8080
+      name: http
+    resources:
+      limits:
+        squat.ai/video: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mjpeg-service
+  namespace: demo
+spec:
+  selector:
+    app.kubernetes.io/name: mjpeg
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+    nodePort: 30674
+  type: NodePort

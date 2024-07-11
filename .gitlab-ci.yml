@@ -1,0 +1,51 @@
+include:
+  - project: 'resengit/gitlab/pipeline-helpers'
+    ref: main
+    file: '/pipelines/docker-image.yaml'
+  - project: 'resengit/gitlab/pipeline-helpers'
+    ref: 'main'
+    file: '/pipelines/helm-chart.yaml'
+
+variables:
+  PH_HELM_CHART_FOLDER: deploy/charts/dynamic-policy-manager
+  PH_HELM_PRE_RELEASES_BRANCH_SLUG: develop
+  PH_SONAR_PROP_python_coverage_reportPaths: coverage.xml
+  PH_SONAR_PROP_sources: src
+
+python-tests:
+  stage: prepare
+  image: python
+  before_script:
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - pip install twine
+  script:
+    - pip install --no-cache-dir --upgrade -r requirements.txt
+    - pip install --no-cache-dir --upgrade -r test-requirements.txt
+    - export PYTHONPATH=src:test
+    - pip install pytest
+    - pytest --junitxml=report.xml --cov=src --cov-report=xml
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - $CI_PROJECT_DIR/.cache/pip
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    paths: [coverage.xml, report.xml]
+
+
+
+documentation_website_builder:
+  trigger:
+    project: 'icos/documentation'
+    branch: 'develop'
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - docs/**/*

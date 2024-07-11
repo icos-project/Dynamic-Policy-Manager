@@ -1,0 +1,161 @@
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background: linear-gradient(to right, #25c481, #25b7c4);
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: -webkit-linear-gradient(left, #25c481, #25b7c4);
+  
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+  
+}
+
+/* Style the close button */
+.topright {
+  float: right;
+  cursor: pointer;
+  font-size: 28px;
+}
+
+.topright:hover {color: red;}
+
+
+/*madigiro-> customization of the policy gui style*/
+div.container{
+	background-color: #ffffff;
+	width: 100%;
+}
+
+
+.col-xs-3{
+	width: 100%;
+	border-collapse: collapse;
+}
+
+
+.custom_h1{
+  font-size: 30px;
+  font-family: arial;
+  color:#120a8f;
+  text-transform: uppercase;
+  font-weight: 900;
+  text-align: left;
+  margin-bottom: 15px;
+  margin-left: 10px;
+  
+}
+
+.custom_h3{
+  font-size: 20px;
+  color: #00f;
+  text-transform: uppercase;
+  font-weight: 900;
+  text-align: left;
+  margin-bottom: 15px;
+  margin-left: 10px;
+}
+
+
+
+table{
+  width:100%;
+  table-layout: fixed;
+  word-wrap: break-word;
+  
+}
+
+.table_icos{
+  width:100%;
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+.tbl-header{
+  font-family: 'Roboto', sans-serif;
+  margin-left:10px;
+  overflow-x:auto;
+  margin-top: 0px;
+  border: 0px solid;
+  text-align: left;
+  background: #ffffff;
+  word-wrap: break-word;
+}
+
+.tbl-content{
+  height:50px;
+  overflow-x:auto;
+  margin-top: 0px;
+  border: 0px solid;
+  text-align: left;
+  background: #ffffff;
+  word-wrap: break-word;
+} 
+
+th{
+  padding: 20px 15px;
+  font-weight: 900;
+  font-size: 20px;
+  color: #5078F2;
+  text-transform: uppercase;
+  word-wrap: break-word;
+  
+}
+td{
+ padding: 15px;
+ vertical-align:middle;
+ font-weight: 400;
+ font-size: 16px;
+ color: #000000;
+ background: linear-gradient(to right, #ffffff, #ffffff);
+ word-wrap: break-word;
+}
+/* demo styles */
+
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700);
+body{
+  background: -webkit-linear-gradient(left, #25c481, #25b7c4);
+  background: linear-gradient(to right, #25c481, #25b7c4);
+  font-family: 'Roboto', 'sans-serif';
+}
+section{
+  margin: 50px;
+}
+
+
+/* follow me template */
+.made-with-icos {
+  margin-top: 10px;
+  padding: 10px;
+  clear: left;
+  text-align: center;
+  font-size: 10px;
+  font-family: arial;
+  color:#ffffff;
+}

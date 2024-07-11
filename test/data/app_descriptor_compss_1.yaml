@@ -1,0 +1,47 @@
+name: compss-demo-1
+description: |
+ A sample COMPSs application to demonstrate application performance policies definition,
+ monitoring and violation
+components:
+- name: compss-app
+  type: manifest
+  manifests:
+  - name: compss-hello-world-demo
+  policies:
+  - fromTemplate: compss-under-allocation
+    # expr: sum by ({{subject_label_list}}) (compss_avgTime_ratio{CoreSignature="replace_with_task_name", {{subject_label_selector}}} * compss_pendTasks_ratio{CoreSignature="replace_with_task_name", {{subject_label_selector}}}) / sum by ({{subject_label_list}}) (compss_node_info{property="computing_units", {{subject_label_selector}}}) / 1000 > 120
+    remediation: scale-up
+    variables:
+      thresholdTimeSeconds: 120
+      compssTask: provesOtel.example_task
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: compss-hello-world-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: compss
+  template:
+    metadata:
+      labels:
+        app: compss
+      annotations:
+        logs.icos.eu/scrape: "true"
+        telemetry.icos.eu/interval: 15s
+        telemetry.icos.eu/scrape: "true"
+        telemetry.icos.eu/path: /metrics
+        telemetry.icos.eu/port: "19090"
+    spec:
+      containers:
+      - name: compss
+        image: francesclordan/icos-demo:1.0
+        env:
+        - name: NUM_TASK
+          value: "10"
+        - name: TASK_LENGTH
+          value: "60"
+        - name: DELAY
+          value: "60"
