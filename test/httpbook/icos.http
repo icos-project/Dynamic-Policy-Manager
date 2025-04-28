@@ -1,0 +1,49 @@
+{{
+const fs = require('node:fs');
+data = fs.readFileSync(__dirname+"/../data/app_descriptor_compss_2.yaml", 'utf8');
+data = data.replaceAll("\"", "\\\"");
+data = data.replace(/(?:\r\n|\r|\n)/g, '\\n');
+exports.appdescr = data;
+}}
+
+POST http://localhost:8000/polman/registry/api/v1/icos/app/
+Authorization: openid password local
+
+{
+    "app_instance": "demo-app-999",
+    "event": "created",
+    "callback": {
+        "uri": "/jobmanager/policies/incompliance/create",
+        "http_method": "POST",
+        "extra_params": {
+            "customParam": "test-1"
+        }
+    },
+    "service": "job-manager",
+    "app_descriptor": "{{appdescr}}"
+}
+###
+POST http://localhost:8000/polman/registry/api/v1/icos/app/
+
+{
+    "app_instance": "demo-app-999",
+    "event": "started",
+    "service": "job-manager"
+}
+###
+POST http://localhost:8000/polman/registry/api/v1/icos/app/
+
+{
+    "app_instance": "demo-app-999",
+    "event": "stopped",
+    "service": "job-manager"
+}
+###
+POST http://localhost:8000/polman/registry/api/v1/icos/app/
+Authorization: openid password local
+
+{
+    "app_instance": "demo-app-999",
+    "event": "deleted",
+    "service": "job-manager"
+}

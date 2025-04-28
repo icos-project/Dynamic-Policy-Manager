@@ -1,38 +1,46 @@
-# ICOS Dynamic Policy Manager
-# Copyright © 2022-2024 Engineering Ingegneria Informatica S.p.A.
 #
+# ICOS Dynamic Policy Manager
+# Copyright © 2022 - 2025 Engineering Ingegneria Informatica S.p.A.
+# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+# 
 # http://www.apache.org/licenses/LICENSE-2.0
-#
+# 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+# 
 # This work has received funding from the European Union's HORIZON research
 # and innovation programme under grant agreement No. 101070177.
+#
 
 import logging
 import sys
 from http.client import HTTPConnection
 
+from rich.console import Console
+from rich.logging import RichHandler
+from rich.panel import Panel
+from rich.pretty import Pretty
+from rich.text import Text
+
 logger = logging.getLogger(__name__)
 
-logging_ctx = {'execution': None, 'step': None, 'workload': None}
+logging_ctx = {"execution": None, "step": None, "workload": None}
 messages_recording_handler_instance = None
-
+main_handler_instance = None
 
 class SystemLogFilter(logging.Filter):
     def filter(self, record):
-        ctxstr = ''
-        if logging_ctx['workload']:
-            ctxstr = '[{workload}:{step}]'.format(**logging_ctx)
-        setattr(record, 'context', ctxstr)
-        record.name_and_lineno = f'{record.name}:{record.lineno}'
+        ctxstr = ""
+        if logging_ctx["workload"]:
+            ctxstr = "[{workload}:{step}]".format(**logging_ctx)
+        setattr(record, "context", ctxstr)
+        record.name_and_lineno = f"{record.name}:{record.lineno}"
         return True
 
 
@@ -57,7 +65,12 @@ class MessagesRecordingHandler(logging.Handler):
         return self.recorded_records
 
 
-def init_logging(verbosity, app_toplevel_logger_name=None, only_fatal_loggers=[]):
+def init_logging(
+    verbosity,
+    app_toplevel_logger_name=None,
+    use_rich_output=False,
+    only_fatal_loggers=[],
+):
     """Configure logging
 
     ┌─────────────────┬───────────┬─────────────────────────────────────────────────────────────────────┐
@@ -79,23 +92,35 @@ def init_logging(verbosity, app_toplevel_logger_name=None, only_fatal_loggers=[]
 
     """
     global messages_recording_handler_instance
+    global main_handler_instance
 
-    logging_format = '%(asctime)s - [%(threadName)-10s] [%(name_and_lineno)s] - %(levelname)s %(context)s: %(message)s'
-    filter = SystemLogFilter()
+    logging_format = "%(asctime)s - [%(threadName)-10s] [%(name_and_lineno)s] - %(levelname)s: %(message)s"
     formatter = logging.Formatter(logging_format)
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
-    handler.addFilter(filter)
+    filter = SystemLogFilter()
+
+    root_logger = logging.getLogger()
+
+    if main_handler_instance:
+        root_logger.removeHandler(main_handler_instance)
+
+    main_handler_instance = (
+        RichHandler() if use_rich_output else logging.StreamHandler(sys.stdout)
+    )
+    if not use_rich_output:
+        main_handler_instance.setFormatter(formatter)
+    main_handler_instance.addFilter(filter)
+
+    if messages_recording_handler_instance:
+        root_logger.removeHandler(messages_recording_handler_instance)
 
     messages_recording_handler_instance = MessagesRecordingHandler()
     messages_recording_handler_instance.setFormatter(formatter)
     messages_recording_handler_instance.addFilter(filter)
 
-    root_logger = logging.getLogger()
-    app_logger =  logging.getLogger(__name__.split('.')[0])
-
+    root_logger.addHandler(main_handler_instance)
     root_logger.addHandler(messages_recording_handler_instance)
-    root_logger.addHandler(handler)
+
+    app_logger = logging.getLogger(__name__.split(".")[0])
 
     if verbosity <= -1:
         root_logger.disabled = True
@@ -123,9 +148,9 @@ def init_logging(verbosity, app_toplevel_logger_name=None, only_fatal_loggers=[]
 
     for logger_name in only_fatal_loggers:
         logging.getLogger(logger_name).setLevel(logging.FATAL)
-        logger.debug(f'Disabled (only FATAL messages) logger {logger_name}')
+        logger.debug(f"Disabled (only FATAL messages) logger {logger_name}")
 
-    logger.info('Logging initialized')
+    logger.info("Logging initialized")
 
 
 def set_logging_context(**kwargs):
@@ -133,8 +158,19 @@ def set_logging_context(**kwargs):
 
 
 def start_logs_recording():
-    messages_recording_handler_instance.start_recording()
+    if messages_recording_handler_instance:
+        messages_recording_handler_instance.start_recording()
 
 
 def stop_logs_recording():
-    return messages_recording_handler_instance.stop_recording()
+    if messages_recording_handler_instance:
+        return messages_recording_handler_instance.stop_recording()
+
+
+def log_object(obj):
+    panel = Panel(Pretty(obj, expand_all=True))
+    console = Console(width=150)
+    with console.capture() as capture:
+        console.print(panel)
+
+    return Text.from_ansi(capture.get())

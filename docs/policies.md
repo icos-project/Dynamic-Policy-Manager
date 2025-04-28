@@ -1,21 +1,15 @@
 
 # Policies
 
-A common model for expressing the policies is adopted and used to store the policies internally and to transfer
-the policies in the ICOS MetaOS system. 
-Specifically, a policy is made of three essential parts:
+The policies consist of three main parts:
 
-  - a subject (subject)
-  - a specification (spec)
-  - an action (action)
+- **Subject**: Defines the entity to which the policy applies (e.g., an application or a host).
+- **Specification**: Describes the policy's details, including conditions and triggers.
+- **Action**: Specifies the action to be taken when a policy violation occurs (e.g., sending a webhook).
 
-In addition we have other information as :
- - varaibles
- - properties
-  
-  
+In addition, policies can include **variables** and **properties** for further customization. 
+
 The group of information, for the policy, are collected in a json format file:
-
 
 ```json
 
@@ -45,33 +39,34 @@ The group of information, for the policy, are collected in a json format file:
 
 ```
 
-For exmaple we can create a policy with the following characteristic:
+The example below outlines a policy that monitors CPU usage on a specific host and triggers a webhook action 
+if the usage exceeds a predefined threshold:
 
 ```json
-policy = {
-        "name": "cpu_usage-for-agent",
-         "subject": {
-            "type": "host",
-            "hostId": "57e17cac94714bf6976f1e071d64d586",
-            "agentId": "icos-agent-1"
-        },
-        "spec": {
-            "description": "",
-            "type": "telemetryQuery",
-            "expr": "avg without (mode,cpu) (1 - rate(node_cpu_seconds_total{mode=\"idle\", icos_agent_id=\"icos-agent-1\", icos_host_id=\"57e17cac94714bf6976f1e071d64d586\"}[2m])) > 0.5",
-            "violatedIf": None,
-            "thresholds": None
-        },
-        "action": {
-            "type": "webhook",
-            "url": "https://localhost:3246/",
-            "httpMethod": "POST",
-            "extraParams": {},
-            "includeAccessToken": False
-        },
-        "variables": {
-            "maxCpu": "0.5"
-        },
-        "properties": {}
-    }
+{
+  "name": "cpu_usage-for-agent",
+  "subject": {
+    "type": "host",
+    "hostId": "57e17cac94714bf6976f1e071d64d586",
+    "agentId": "icos-agent-1"
+  },
+  "spec": {
+    "description": "Monitor CPU usage",
+    "type": "telemetryQuery",
+    "expr": "avg without (mode,cpu) (1 - rate(node_cpu_seconds_total{mode=\"idle\", icos_agent_id=\"icos-agent-1\", icos_host_id=\"unique_node_id\"}[2m])) > 0.5",
+    "violatedIf": null,
+    "thresholds": null
+  },
+  "action": {
+    "type": "webhook",
+    "url": "https://localhost:3246/",
+    "httpMethod": "POST",
+    "extraParams": {},
+    "includeAccessToken": false
+  },
+  "variables": {
+    "maxCpu": "0.5"
+  },
+  "properties": {}
+}
 ```

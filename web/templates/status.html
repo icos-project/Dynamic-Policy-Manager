@@ -169,7 +169,7 @@
      <tbody>
 		<tr>
 	        <td colspan=2>
-	        {%for key, item in p.spec %} 
+	        {%for key, item in p.status.renderedSpec %} 
 	          <p><label class="label label-info">{{key}}</label>&nbsp;:&nbsp;&nbsp;{{item}} </p>
 	        {% endfor %}
 	        </td>

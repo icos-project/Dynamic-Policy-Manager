@@ -1,0 +1,19 @@
+{
+    "name": "gabriele-app-container-cpu-utilization",
+    "subject": {
+        "appName": "fake-gabriele-app",
+        "appComponent": "backend",
+        "appInstance": "9997ccb4-3dd9-4f5c-aac9-d69160c373c6"
+    },
+    "spec": {
+        "expr": "container_cpu_utilization_ratio{ { {subject_label_selector} } }",
+        "violatedIf": "> 0.5"
+    },
+    "properties": {
+        "pendingInterval": "30s"
+    },
+    "action": {
+        "url": "http://localhost:3456/",
+        "httpMethod": "POST"
+    }
+}

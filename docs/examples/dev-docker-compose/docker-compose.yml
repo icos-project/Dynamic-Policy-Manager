@@ -1,0 +1,50 @@
+services:
+  
+  # Policy Manager
+  #
+  polman:
+
+    # Use always the latest development version. This is in a private repository, to login
+    # use:
+    #   > docker login harbor.res.eng.it/icos-private
+    #
+    image: harbor.res.eng.it/icos-private/meta-kernel/dynamic-policy-manager/develop:latest
+    environment:
+      PLM_VERBOSITY: 3
+      PLM_API_HOST: 0.0.0.0
+      PLM_AUTHN_SKIP: "true"
+      PLM_AUTHZ_SKIP: "true"
+      PLM_DB_TYPE: "mongodb"
+      PLM_DB_HOST: "mongo"
+      PLM_PROMETHEUS_RULES_API_URL: http://prometheus-api:5000/api/v1/rules
+    ports:
+    - 8000:8000
+  
+  # Supporting services
+  #
+  mongo:
+    image: mongo
+    volumes:
+      - 'mongodb-data:/data/db'
+
+  prometheus:
+    image: prom/prometheus:v2.44.0
+    volumes:
+      - "prom-rules:/etc/prometheus/rules"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-lifecycle
+      - --web.enable-admin-api
+
+  prometheus-api:
+    image: hayk96/prometheus-api:latest
+    volumes:
+      - "prom-rules:/app/rules:rw"
+    command:
+      - --prom.addr=http://prometheus:9090
+      - --rule.path=/app/rules
+      - --web.enable-ui=true
+
+volumes:
+  mongodb-data: {}
+  prom-rules: {}

@@ -1,11 +1,28 @@
 .project
 .pydevproject
+.settings
+.httpyac
+
+### Devenv ###
+.devenv
+.devenv.flake.nix
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+### Local env ###
 .env.local
+
+### Python generated files ###
 __pycache__
-.vscode
-.venv
+.pytest_cache
+
+
+### App-specific generated files ###
 dpm.db
 deploy/charts/dynamic-policy-manager/charts
-.settings
-.git
-docs/design

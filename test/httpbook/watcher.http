@@ -1,0 +1,3 @@
+POST http://localhost:8000/polman/watcher/api/v1/test/violate/67ab458f4db0f81f02e93821/0.9?my_label=ciao&another=value
+###
+POST http://localhost:8000/polman/watcher/api/v1/test/resolve/67ab458f4db0f81f02e93821

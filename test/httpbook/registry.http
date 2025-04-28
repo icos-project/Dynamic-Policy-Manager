@@ -1,0 +1,15 @@
+GET http://localhost:8000/polman/registry/api/v1/policies/
+Authorization: openid password local
+###
+POST http://localhost:8000/polman/registry/api/v1/policies/
+Authorization: openid password local
+
+<@ ./cpu_policy.json
+###
+
+POST http://localhost:8000/polman/registry/api/v1/policies/67ab45694db0f81f02e93820/deactivate
+Authorization: openid password local
+
+###
+DELETE http://localhost:8000/polman/registry/api/v1/policies/679770bcf2be8d23f4a0f8bd
+Authorization: openid password local

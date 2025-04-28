@@ -11,7 +11,7 @@ by itself; it then sends the remediation action to the Job Manager otherwise the
 sends a request of the suggested action to the intelligence block.
 
 ## Development
-An [API](docs/api.md) REST is implemetend for the [use](docs/usage.md) of the Dynamic Policy Manager.
+An [API](api.md) REST is implemetend for the [use](usage.md) of the Dynamic Policy Manager.
 
 ### Requirements
 
@@ -23,36 +23,13 @@ It's possible to run it in different way:
 
 After that you can follows the next steps.
 
-### How to deploy
+### Development and testing
 
-Before to run the application in development mode, it is suggested to create a [virtual environment](https://docs.python.org/3.11/library/venv.html) and 
-install the packages in ```[requirements.txt](requirements.txt)```
+Please read the `./docs/development.md` file.
 
-Run a local instance without authn and authz and using a default sqlite db
+# Legal
+The Dynamic Policy Manager is released under the [Apache License version 2.0](LICENSE).
+Copyright 2022 - 2025 Engineering Ingegneria Informatica S.p.A., All rights reserved.
 
-```bash
-cd src
-python -m polman.cli.main --db-url sqlite:///./dpm.db --verbosity 3 --authn-skip true --authz-skip true
-```
-
-The parameters can be passed also through env variables
-
-E.g.:
-
-```bash
-DPLM_DB_TYPE=mysql
-DPLM_DB_HOST=localhost
-DPLM_DB_USER=root
-DPLM_DB_PASSWORD=root
-DPLM_DB_PORT=3306
-DPLM_DB_NAME=dpm
-
-DPLM_AUTHN_CLIENT_SECRET=xxxx
-DPLM_AUTHN_CLIENT_ID=shell-backend
-DPLM_AUTHN_SERVER=https://keycloak.dev.icos.91.109.56.214.sslip.io/
-DPLM_AUTHN_REALM=icos-dev
-DPLM_AUTHZ_SKIP=true
-DPLM_API_PORT=8000
-DPLM_VERBOSITY=3
-```
+This work has received funding from the European Union's HORIZON research and innovation programme under grant agreement No. 101070177.
 

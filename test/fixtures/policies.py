@@ -1,28 +1,31 @@
-# ICOS Dynamic Policy Manager
-# Copyright © 2022-2024 Engineering Ingegneria Informatica S.p.A.
 #
+# ICOS Dynamic Policy Manager
+# Copyright © 2022 - 2025 Engineering Ingegneria Informatica S.p.A.
+# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+# 
 # http://www.apache.org/licenses/LICENSE-2.0
-#
+# 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+# 
 # This work has received funding from the European Union's HORIZON research
 # and innovation programme under grant agreement No. 101070177.
+#
 
 import pytest
 
 from polman.common.model import Policy, PolicyCreate
+from polman.registry.render import render_policy_spec
 from polman.watcher.model import AlertmanagerAlert
 from test.common.policy_factories import PolicyFactory
 from test.utils import build
-from test.data import policy_host_cpu_144
+from test.data import policy_host_cpu_144, policy_app_container_cpu
 
 @pytest.fixture(scope="session")
 def test_policy_factory():
@@ -33,12 +36,12 @@ policy1_id = 'c0621b34-d7bc-4891-89a0-fa297c9d4d38'
 policy_2_id = "fd745e25-0ca3-418b-b310-257693e3f3bf"
 
 @pytest.fixture(scope='function')
-def policy1(policy_create_1):
-  return Policy(**policy_create_1.model_dump(), id=policy1_id)
+def policy1(policy_1_create):
+  return Policy(**policy_1_create.model_dump(), id=policy1_id)
   
 
 @pytest.fixture(scope='function')
-def policy_create_1(policy_c1):
+def policy_1_create(policy_c1):
   return build(PolicyCreate, policy_c1)
 
 @pytest.fixture(scope='function')
@@ -54,7 +57,7 @@ def policy_c1():
         "violatedIf": "> {{maxCpu}}"
       },
       "variables": {
-        "maxCpu": "0.8"
+        "maxCpu": 0.8
       },
       "action": {
         "url": "https://localhost:3246/",
@@ -82,7 +85,7 @@ def policy_2_create():
     },
     "variables": {
         "compssTask": "provesOtel.example_task",
-        "thresholdTimeSeconds": "120"
+        "thresholdTimeSeconds": 120
     },
     "properties": {
         "pendingInterval": "30s"
@@ -121,10 +124,46 @@ def policy_3_create():
     }
 })
 
+
+@pytest.fixture(scope='session')
+def policy_4_create():
+  return build(PolicyCreate, {
+    "name": "cpu_utilization_on_hosts",
+    "subject": {
+        "appName": "my-second-app",
+        "appComponent": "component1",
+        "appInstance": "111-222-321-002"
+    },
+    "spec": {
+        "expr": "tlum_workload_info{ {{subject_label_selector}} } *on(icos_host_id) group_left avg without (cpu) (1 - rate(node_cpu_seconds_total{mode=\"idle\"}[2m]))",
+        "violatedIf": "> {{maxCpu}}",
+        "thresholds": {
+            "warning": 0.6,
+            "critical": 0.8
+        }
+    },
+    "variables": {
+        "maxCpu": "0.8"
+    },
+    "action": {
+        "url": "https://0e77-94-33-209-155.ngrok-free.app",
+        "httpMethod": "POST"
+    }
+})
+
+@pytest.fixture(scope='session')
+def policy_5_create():
+  return build(PolicyCreate, {
+    "spec": {
+      "templateName": "compss-under-allocation"
+    }
+  })
   
 @pytest.fixture(scope='function')
 def policy_2_db(policy_2_create):
-  return Policy(**policy_2_create.model_dump(), id=policy_2_id)
+  p = Policy(**policy_2_create.model_dump(), id=policy_2_id)
+  p.status.renderedSpec = render_policy_spec(p)
+  return p
 
 @pytest.fixture(scope='session')
 def policy_2_alerts():
@@ -169,6 +208,40 @@ def policy_2_alerts():
     ]
 }
   
+
+@pytest.fixture(scope='session')
+def policy_compss_1_alert():
+  return build(AlertmanagerAlert, {
+            "status": "firing",
+            "labels": {
+                "alertname": "cpu_usage-for-agent:rule-0",
+                "http_scheme": "http",
+                "icos_agent_id": "icos-agent-1",
+                "icos_alpha_latitude": "41.390205",
+                "icos_alpha_longitude": "2.154007",
+                "icos_container_name": "node-exporter",
+                "icos_controller_id": "staging-a",
+                "icos_host_id": "57e17cac94714bf6976f1e071d64d586",
+                "icos_host_name": "93111014-6276-4c1f-83eb-a5f7aa8386c9:icosedge",
+                "instance": "10.150.0.144:9100",
+                "net_host_port": "9100",
+                "receive": "true",
+                "service_instance_id": "10.150.0.144:9100",
+                "service_name": "icos-annotated-services",
+                "icos_app_name": "compss-demo-1",
+                "icos_app_instance": "demo-compss-1-xxx",
+                "icos_app_component": "compss-app"
+            },
+            "annotations": {
+                "plm_expr_value": "1",
+                "plm_id": policy1_id,
+                "plm_measurement_backend": "prom-1"
+            },
+            "startsAt": "2024-02-14T09:39:39.775655Z",
+            "endsAt": "0001-01-01T00:00:00Z",
+            "generatorURL": "http://contrl1-thanos-query.icos-system.svc.cluster.local:9090/graph?g0.expr=avg+without+%28mode%2C+cpu%29+%281+-+rate%28node_cpu_seconds_total%7Bicos_agent_id%3D%22icos-agent-1%22%2Cicos_host_id%3D~%22.%2B%22%2Cmode%3D%22idle%22%7D%5B2m%5D%29%29+%3E+0.8&g0.tab=1",
+            "fingerprint": "659b7c60752cae70"
+        })
 
 @pytest.fixture(scope='session')
 def policy_c1_alert():
@@ -231,4 +304,8 @@ def policy_cpu144_resolve_dict():
     d['alerts'][0]['annotations']['plm_id'] = policy_id
     return d
   return __get_resolve_with_policy_id
-   
+
+
+@pytest.fixture
+def policy_app_container_cpu_create() -> PolicyCreate:
+    return build(PolicyCreate, policy_app_container_cpu.policy)

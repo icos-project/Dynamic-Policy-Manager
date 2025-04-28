@@ -1,0 +1,11 @@
+/*
+# Get token permissions
+*/
+POST http://localhost:8080/realms/local-dev/protocol/openid-connect/token
+Authorization: openid password local
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:uma-ticket
+&audience=polman
+&permission=policies#read
+&response_mode=permissions
